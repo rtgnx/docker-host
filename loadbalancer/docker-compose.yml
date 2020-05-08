@@ -10,8 +10,8 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       # Change local path to point to SSL certificate and key
-      - ${SSL_CERT}:/etc/ssl/certificate.crt
-      - ${SSL_KEY}:/etc/ssl/key.pem
+      - "${SSL_CERT}:/etc/ssl/certificate.crt"
+      - "${SSL_KEY}:/etc/ssl/key.pem"
     networks:
       - web
     ports:

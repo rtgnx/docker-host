@@ -20,7 +20,7 @@ services:
       - "traefik.docker.network=web"
       - "traefik.backend=controller"
       - "traefik.frontend.entryPoints=http,https"
-      - "traefik.frontend.rule=Host:${DOCKER_HOST}"
+      - "traefik.frontend.rule=Host:${DOCKER_HOSTNAME}"
 
 networks:
   web:
