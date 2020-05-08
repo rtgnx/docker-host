@@ -28,4 +28,4 @@ networks:
 
 volumes:
   data:
-    driver: convoy
+    driver: ${VOLUME_DRIVER}
