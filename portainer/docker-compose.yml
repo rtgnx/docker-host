@@ -1,0 +1,31 @@
+version: "2.1"
+services:
+  controller:
+    image: portainer/portainer:latest
+    container_name: controller
+    privileged: true
+    restart: unless-stopped
+    hostname: ${DOCKER_HOST}
+    networks:
+      - web
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - data:/data
+    ports:
+      - 9000:9000
+    labels:
+      - "traefik.enable=true"
+      - "traefik.port=9000"
+      - "traefik.protocol=http"
+      - "traefik.docker.network=web"
+      - "traefik.backend=controller"
+      - "traefik.frontend.entryPoints=http,https"
+      - "traefik.frontend.rule=Host:${DOCKER_HOST}"
+
+networks:
+  web:
+    external: true
+
+volumes:
+  data:
+    driver: convoy
