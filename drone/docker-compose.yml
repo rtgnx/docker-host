@@ -1,0 +1,58 @@
+version: '2.1'
+services:
+  drone-server:
+    container_name: drone-server
+    image: drone/drone:1.0.0-rc.5
+    hostname: drone.rev.labs
+    volumes:
+      - server-data:/var/lib/drone/
+    restart: unless-stopped
+    environment:
+      # - DRONE_OPEN=false
+      - DRONE_SERVER_HOST=drone.${REALM}# tunnel hostname       
+      - DRONE_ADMIN=${DRONE_ADMIN}
+      - DRONE_SERVER_PROTO=http # tunnel adds https on top
+      - DRONE_RPC_SECRET=${DRONE_RPC_SECRET}
+    labels:
+      - "traefik.enable=true"
+      - "traefik.port=80"
+      - "traefik.protocol=http"
+      - "traefik.docker.network=web"
+      - "traefik.backend=lb"
+      - "traefik.frontend.entryPoints=http,https"
+      - "traefik.frontend.rule=Host:drone.${REALM}"
+
+  drone-agent:
+    container_name: drone-agent
+    image: drone/agent:1.0.0-rc.5
+    command: agent
+    restart: unless-stopped
+    depends_on:
+      - drone-server
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      - DRONE_RPC_SERVER=https://drone.rev.labs
+      - DRONE_RPC_SECRET=${DRONE_RPC_SECRET}
+      - DRONE_RUNNER_CAPACITY=10
+      - DRONE_RUNNER_NAME="local"
+
+  webhookrelay:
+    container_name: drone-webhookrelay
+    image: webhookrelay/webhookrelayd:latest
+    command:
+      - --mode 
+      - tunnel 
+      - -t
+      - drone
+    restart: unless-stopped
+    depends_on:
+      - drone-server
+    environment: 
+      - KEY=${WEBHOOK_KEY}
+      - SECRET=${WEBHOOK_SECRET}
+
+volumes:
+  server-data:
+    driver: convoy
+
