@@ -5,7 +5,7 @@ services:
     container_name: controller
     privileged: true
     restart: unless-stopped
-    hostname: ${DOCKER_HOST}
+    hostname: ${DOCKER_HOSTNAME}
     networks:
       - web
     volumes:
