@@ -1,0 +1,32 @@
+logLevel = "INFO"
+
+
+[traefikLog]
+filePath = "/var/log/traefik.log"
+format = "json"
+
+[accessLog]
+filePath = "/var/log/access.log"
+format = "json"
+
+[docker]
+  endpoint = "unix:///var/run/docker.sock"
+  network = "web"
+  watch = true
+
+[web]
+    address = ":8080"
+    readOnly = false
+
+ [entryPoints]
+    [entryPoints.http]
+        address = ":80"
+        [entryPoints.http.redirect]
+            entryPoint = "https" 
+            permanent = true
+    [entryPoints.https]
+        address = ":443"
+
+    [[entryPoints.https.tls.certificates]]
+        certFile = "/etc/ssl/certificate.crt"
+        keyFile = "/etc/ssl/key.pem"

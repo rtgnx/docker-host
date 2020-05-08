@@ -1,0 +1,41 @@
+version: "2.1"
+services:
+  loadbalancer:
+    build: .
+    image: rg.fr-par.scw.cloud/reverselabs/traefik
+    container_name: loadbalancer
+    privileged: true
+    command:
+        - "--configFile=/etc/traefik.toml"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      # Change local path to point to SSL certificate and key
+      - ${SSL_CERT}:/etc/ssl/certificate.crt
+      - ${SSL_KEY}:/etc/ssl/key.pem
+    networks:
+      - web
+    ports:
+      - 80:80
+      - 443:443
+      - 8080:8080
+    environment: 
+      CAP_HOST_MANAGEMENT: 1
+    labels:
+      - "traefik.enable=true"
+      - "traefik.port=8080"
+      - "traefik.protocol=http"
+      - "traefik.docker.network=web"
+      - "traefik.backend=lb"
+      - "traefik.frontend.entryPoints=http,https"
+      - "traefik.frontend.rule=Host:lb.${REALM}"
+
+networks:
+  web:
+    name: web
+    driver: bridge
+    driver_opts:
+      com.docker.network.enable_ipv6: "true"
+      com.docker.network.name: "web"
+    ipam:
+      config:
+        - subnet: 10.24.0.0/16
