@@ -18,7 +18,7 @@ services:
       - "traefik.port=80"
       - "traefik.protocol=http"
       - "traefik.docker.network=web"
-      - "traefik.backend=lb"
+      - "traefik.backend=drone"
       - "traefik.frontend.entryPoints=http,https"
       - "traefik.frontend.rule=Host:drone.${REALM}"
 
